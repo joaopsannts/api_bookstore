@@ -165,3 +165,33 @@ export const atualizarAutor = async (request, response) => {
     response.stataus(500).json({mensagem:"Erro interno ao atualizar autor"})
   }
 };
+
+export const deletarAutor = async (request, response) => {
+  const id = request.params.id;
+
+  if (!id) {
+    response.status(400).json({
+      erro: "Parâmetro ID incorreto",
+      mensagem: "O id não pode ser nulo",
+    });
+    return;
+  }
+
+  try {
+    // V = 1, F = 0
+    const deletarAutor = await autorModel.destroy({
+      where: {id}
+    })
+
+    if(deletarAutor === 0){
+      response.status(404).json({mensagem:"Autor não encontrado"})
+      return
+    }
+
+    response.status(204).send()
+
+  } catch (error) {
+    console.log(error)
+    response.status(500).json({mensagem:"Erro interno ao excluir"})
+  }
+}
