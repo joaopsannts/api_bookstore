@@ -63,6 +63,9 @@ export const cadastrarAutor = async (request, response) => {
   }
 };
 
+//:3333/autores?page=1&limit=3
+// offset=3 -> 1|2|3|4|5|6|7|8|9|
+///            0|1|2|3|4|5|6|7|8| 
 export const listarTodosAutores = async (request, response) => {
   const page = parseInt(request.query.page) || 1;
   const limit = parseInt(request.query.limit) || 10;
@@ -91,3 +94,31 @@ export const listarTodosAutores = async (request, response) => {
       .json({ mensagem: "Erro interno no servidor ao listar autores" });
   }
 };
+
+//body? params? query?
+export const listarAutor = async (request, response) => {
+  const {id} = request.params
+
+  if(!id){
+    response.status(400).json({
+      erro: "Parâmetro ID incorreto",
+      mensagem: "O id não pode ser nulo",
+    });
+    return;
+  }
+
+  try {
+    const autor = await autorModel.findByPk(id) 
+
+    if(!autor){
+      response.status(404).json({mensagem: 'Autor não existe!'})
+      return
+    }
+
+    response.status(200).json(autor)
+
+  } catch (error) {
+    console.log(error)
+    response.status(500).json({mensagem:"Erro interno ao buscar autor"})
+  }
+}

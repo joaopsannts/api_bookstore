@@ -2,7 +2,7 @@
 ### Funcionalidades
 [x] Cadastro de autores
 [x] Listagem de autores (com paginação)
-[ ] Busca por autor específico
+[x] Busca por autor específico
 [ ] Atualização de dados do autor
 [ ] Remoção de autor
 {
