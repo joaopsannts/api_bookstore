@@ -3,7 +3,7 @@
 [x] Cadastro de autores
 [x] Listagem de autores (com paginação)
 [x] Busca por autor específico
-[ ] Atualização de dados do autor
+[x] Atualização de dados do autor
 [ ] Remoção de autor
 {
   "id": "string/number",

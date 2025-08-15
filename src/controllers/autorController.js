@@ -65,7 +65,7 @@ export const cadastrarAutor = async (request, response) => {
 
 //:3333/autores?page=1&limit=3
 // offset=3 -> 1|2|3|4|5|6|7|8|9|
-///            0|1|2|3|4|5|6|7|8| 
+///            0|1|2|3|4|5|6|7|8|
 export const listarTodosAutores = async (request, response) => {
   const page = parseInt(request.query.page) || 1;
   const limit = parseInt(request.query.limit) || 10;
@@ -97,9 +97,9 @@ export const listarTodosAutores = async (request, response) => {
 
 //body? params? query?
 export const listarAutor = async (request, response) => {
-  const {id} = request.params
+  const { id } = request.params;
 
-  if(!id){
+  if (!id) {
     response.status(400).json({
       erro: "Parâmetro ID incorreto",
       mensagem: "O id não pode ser nulo",
@@ -108,17 +108,60 @@ export const listarAutor = async (request, response) => {
   }
 
   try {
-    const autor = await autorModel.findByPk(id) 
+    const autor = await autorModel.findByPk(id);
 
-    if(!autor){
-      response.status(404).json({mensagem: 'Autor não existe!'})
+    if (!autor) {
+      response.status(404).json({ mensagem: "Autor não existe!" });
+      return;
+    }
+
+    response.status(200).json(autor);
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ mensagem: "Erro interno ao buscar autor" });
+  }
+};
+
+//1- Identificar autor para atualizar, 2- Receber os dados para atualizar
+export const atualizarAutor = async (request, response) => {
+  const id = request.params.id;
+  const { nome, biografia, data_nascimento, nacionalidade } = request.body;
+
+  if (!id) {
+    response.status(400).json({
+      erro: "Parâmetro ID incorreto",
+      mensagem: "O id não pode ser nulo",
+    });
+    return;
+  }
+
+  try {
+    const autorSelecionado = await autorModel.findOne({
+      where: { id },
+    });
+
+    if(!autorSelecionado){
+      response.status(404).json({mensagem:"Autor não encontrado"})
       return
     }
 
-    response.status(200).json(autor)
+    if(nome !== undefined){
+      autorSelecionado.nome = nome
+    }
+    if(biografia !== undefined){
+      autorSelecionado.biografia = biografia
+    }
+    if(data_nascimento !== undefined){
+      autorSelecionado.data_nascimento = data_nascimento
+    }
+    if(nacionalidade !== undefined){
+      autorSelecionado.nacionalidade = nacionalidade
+    }
 
+    await autorSelecionado.save()
+    response.status(200).json({mensagem:"Autor atualizado com sucesso!"})
   } catch (error) {
     console.log(error)
-    response.status(500).json({mensagem:"Erro interno ao buscar autor"})
+    response.stataus(500).json({mensagem:"Erro interno ao atualizar autor"})
   }
-}
+};
