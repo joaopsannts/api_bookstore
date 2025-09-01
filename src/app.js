@@ -3,10 +3,11 @@ import cors from "cors";
 import { conn } from "./config/sequelize.js";
 
 //Tabelas
-import './models/associations.js'
+import "./models/associations.js";
 
 //Rotas
-import autorRoutes from "./routes/autorRoutes.js"
+import autorRoutes from "./routes/autorRoutes.js";
+import livroRoutes from "./routes/livroRoutes.js";
 
 const app = express();
 
@@ -27,7 +28,8 @@ conn
   .catch((error) => console.log(error));
 
 //Usando as rotas
-app.use("/api/autores", autorRoutes)
+app.use("/api/autores", autorRoutes);
+app.use("/api/livros", livroRoutes);
 
 app.get("/", (request, response) => {
   response.status(200).json({ mensagem: "Olá, Mundo" });
