@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import { conn } from "./config/sequelize.js";
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 //Tabelas
 import "./models/associations.js";
 
@@ -11,6 +14,9 @@ import livroRoutes from "./routes/livroRoutes.js";
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 app.use(
   cors({
     origin: "*",
@@ -18,8 +24,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json());// Aceita receber JSON
+app.use(express.urlencoded({extended: true})) //Aceita receber arquivos
 
+app.use("/public", express.static(path.join(__dirname, '../public')))
+//{alter: true} - atualiza a tabela | {force: true} - recria o banco
 conn
   .sync()
   .then(() => {
