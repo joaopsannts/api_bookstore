@@ -14,3 +14,7 @@
   "createdAt": "datetime",
   "updatedAt": "datetime"
 }
+
+1 - Não mostrar mensagem de sucesso se tentar remover a capa de um livro que não tem capa - OK
+2 - Se um livro já tem capa, quando casdastrar uma nova capa para o mesmo livro sistema deve remover a capa antiga - OK
+3 -

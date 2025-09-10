@@ -2,7 +2,9 @@ import { Router } from "express";
 import {
   cadastrarLivro,
   listarTodosLivros,
-  cadastrarCapaLivro
+  cadastrarCapaLivro,
+  buscarImagemCapa,
+  deletarImagemCapa,
 } from "../controllers/livroController.js";
 
 //middlewares
@@ -15,5 +17,7 @@ router.get("/", listarTodosLivros);
 
 //ROTAS DAS IMAGENS
 router.post("/:id/imagem", imageUpload.single('imagem'), cadastrarCapaLivro);
+router.get("/upload/livros/:filename", buscarImagemCapa)
+router.delete("/:id/imagem", deletarImagemCapa)
 
 export default router;

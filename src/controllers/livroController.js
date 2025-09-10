@@ -1,6 +1,13 @@
 //importar os dois modelos selec JOINS
 import { autorModel, livroModel } from "../models/associations.js";
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { existsSync, unlinkSync } from "node:fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const cadastrarLivro = async (request, response) => {
   const {
     titulo,
@@ -155,6 +162,8 @@ export const listarTodosLivros = async (request, response) => {
         genero: livro.genero,
         quantidade_total: livro.quantidade_total,
         quantidade_disponivel: livro.quantidade_disponivel,
+        imagem_capa: livro.imagem_capa,
+        imagem_url: livro.imagem_url,
         autores: livro.autores.map((autor) => ({
           id: autor.id,
           nome: autor.nome,
@@ -186,30 +195,112 @@ export const deletarLivro = async (request, response) => {};
 //CONTROLADORES DAS ROTAS DE IMAGENS
 export const cadastrarCapaLivro = async (request, response) => {
   const { id } = request.params;
-  const {filename, path} = request.file;
+  const { filename, path } = request.file;
 
-  if(!id){
-    response.status(400).json({mensagem:"O Id é obrigatório"})
-    return
+  if (!id) {
+    response.status(400).json({ mensagem: "O Id é obrigatório" });
+    return;
   }
 
   try {
-    const livro = await livroModel.findByPk(id)
+    const livro = await livroModel.findByPk(id);
 
-    if(!livro){
-      response.status(404).json({mensagem:"Livro não existe"})
-      return
+    if (!livro) {
+      response.status(404).json({ mensagem: "Livro não existe" });
+      return;
     }
 
-    livro.imagem_capa = filename
-    livro.imagem_url = path
+    // Validação para se existir uma capa cadastrada, durante o cadastro da nova excluir a antiga
+      const caminhoAntigo = path.join(__dirname, "../../public/livros", livro.imagem_capa);
+      if(localizarDiretorio){
+        unlinkSync(caminhoAntigo)
+      }
+    
 
+    livro.imagem_capa = filename;
+    livro.imagem_url = path;
+
+    await livro.save();
+
+    response.status(200).json({ mensagem: "Capa cadastrada", livro });
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ mensagem: "Erro interno ao cadastrar capa" });
+  }
+};
+
+export const buscarImagemCapa = async (request, response) => {
+  const { filename } = request.params;
+
+  if (!filename) {
+    response.status(400).json({ mensagem: "parâmetro filename é obrigatório" });
+    return;
+  }
+
+  try {
+    const livro = await livroModel.findOne({
+      where: {
+        imagem_capa: filename,
+      },
+    });
+
+    if (!livro) {
+      response.status(404).json({ mensagem: "Livro não encontrado" });
+      return;
+    }
+
+    const caminhoImagem = path.join(__dirname, "../../public/livros", filename);
+
+    //validação
+
+    response.status(200).sendFile(caminhoImagem);
+  } catch (error) {}
+};
+
+export const deletarImagemCapa = async (request, response) => {
+  const { id } = request.params;
+
+  //validar a informação
+  if (!id) {
+    response.status(400).json({ mensagem: "O ID é obrigatório" });
+    return;
+  }
+
+  try {
+    const livro = await livroModel.findByPk(id);
+
+    if (!livro) {
+      response.status(404).json({ mensagem: "Livro não encontrado" });
+      return;
+    }
+
+    if (!livro.imagem_capa === "filename") {
+      response.status(400).json({ mensagem: "Esse livro não possui capa" });
+      return;
+    }
+
+    const caminhoDaImagemNaPastaPublic = path.join(
+      __dirname,
+      "../../public/livros",
+      livro.imagem_capa
+    );
+
+    if (existsSync(caminhoDaImagemNaPastaPublic)) {
+      unlinkSync(caminhoDaImagemNaPastaPublic);
+    }
+
+    if (!existsSync(caminhoDaImagemNaPastaPublic)) {
+      response.status(400).json({mensagem: "Esse livro não possui capa para apagar!"})
+      return;
+    }
+
+    livro.imagem_capa = "filename";
+    livro.imagem_url = "caminhoDaImagem";
     await livro.save()
 
-    response.status(200).json({mensagem:"Capa cadastrada", livro})
+    response.status(200).json({mensagem:"Cada do livro removida"})
 
   } catch (error) {
-    console.log(error)
-    response.status(500).json({mensagem:"Erro interno ao cadastrar capa"})
+    
   }
 };
