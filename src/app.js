@@ -11,6 +11,7 @@ import "./models/associations.js";
 //Rotas
 import autorRoutes from "./routes/autorRoutes.js";
 import livroRoutes from "./routes/livroRoutes.js";
+import usuarioRoutes from "./routes/usuarioRoutes.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ conn
 //Usando as rotas
 app.use("/api/autores", autorRoutes);
 app.use("/api/livros", livroRoutes);
+app.use("/api/usuario", usuarioRoutes);
 
 app.get("/", (request, response) => {
   response.status(200).json({ mensagem: "Olá, Mundo" });

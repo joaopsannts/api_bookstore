@@ -1,5 +1,6 @@
 import autorModel from "./autorModel.js";
 import livroModel from "./livroModel.js";
+import usuarioModel from "./usuarioModel.js";
 
 //Relacionamento M:N
 autorModel.belongsToMany(livroModel,{
@@ -13,4 +14,5 @@ livroModel.belongsToMany(autorModel,{
     otherKey: 'autor_id'
 });
 
-export { autorModel, livroModel };
+
+export { autorModel, livroModel, usuarioModel };
